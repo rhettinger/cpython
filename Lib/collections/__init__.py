@@ -301,6 +301,59 @@ except ImportError:
 ### namedtuple
 ################################################################################
 
+if 0:
+    def __new__(_cls, *args, **kwds):
+        # XXX need to fix_up signature
+        n = len(args)
+        if n > num_fields:
+            raise TypeError(f'{_cls.__name__}() expected {num_fields} arguments, but {n} were given')
+        newargs = list(args)
+        try:
+            newargs += map(kwds.pop, fields[n:])
+        except KeyError as e:
+            field = e.args[-1]
+            raise TypeError(f'{_cls.__name__}() missing required argument {field!r}') from None
+        if kwds:
+            unexpected_set = set(kwds) - set(fields[n:])
+            unexpected = ' and '.join(map(repr, sorted(unexpected_set)))
+            if len(unexpected_set) == 1:
+                raise TypeError(f'{_cls.__name__}() got an unexpected keyword argument: {unexpected}')
+            else:
+                raise TypeError(f'{_cls.__name__}() got unexpected keyword arguments: {unexpected}')
+        return tuple.__new__(_cls, newargs)
+
+if 0:
+
+    print( T(10, 20, 30, 40, 50, 60) )
+    print( T(10, 20, 30, f=60, e=50, d=40) )
+    print( T(f=60, e=50, d=40, c=30, b=20, a=10) )
+
+
+    try:
+        T(10, 20, 30, 40, 50, 60, 70, 80)
+    except TypeError as e:
+        assert 'were given' in e.args[0].lower()
+
+    try:
+        T(10, 20, 30, 40)
+    except TypeError as e:
+        assert 'missing' in e.args[0].lower()
+
+    try:
+        T(10, 20, 30, 40, 50, 60, h=70)
+    except TypeError as e:
+        assert "unexpected keyword argument: 'h'" in e.args[0].lower()
+
+    try:
+        T(10, 20, 30, 40, 50, 60, h=70, i=80)
+    except TypeError as e:
+        assert "unexpected keyword arguments: 'h' and 'i'" in e.args[0].lower()
+
+    try:
+        T(10, 20, 30, 40, 50, 60, c=70)
+    except TypeError as e:
+        assert "unexpected keyword argument: 'c'" in e.args[0].lower()
+
 _nt_itemgetters = {}
 
 def namedtuple(typename, field_names, *, rename=False, module=None):
