@@ -301,58 +301,42 @@ except ImportError:
 ### namedtuple
 ################################################################################
 
-if 0:
+def _nt_create_new_with_exec(typename, field_names):
+    'Make a fast instantiating __new__() method using templating and exec()'
+    # Note: exec() interns the fieldnames and provides the method signature
+    arg_list = repr(field_names).replace("'", "")[1:-1]
+    s = f'def __new__(_cls, {arg_list}): return _tuple_new(_cls, ({arg_list}))'
+    namespace = {'_tuple_new': tuple.__new__, '__name__': f'namedtuple_{typename}'}
+    exec(s, namespace)
+    return namespace['__new__']
+
+def _nt_create_new_without_exec(typename, field_names):
+    'Make a slow instantiating __new__() method with relying on exec()'
+    num_fields = len(field_names)
+    tuple_new = tuple.__new__
+    _list, _len, _map = list, len, map
+
     def __new__(_cls, *args, **kwds):
-        # XXX need to fix_up signature
-        n = len(args)
+        n = _len(args)
         if n > num_fields:
             raise TypeError(f'{_cls.__name__}() expected {num_fields} arguments, but {n} were given')
-        newargs = list(args)
+        newargs = _list(args)
         try:
-            newargs += map(kwds.pop, fields[n:])
+            newargs += _map(kwds.pop, field_names[n:])
         except KeyError as e:
             field = e.args[-1]
             raise TypeError(f'{_cls.__name__}() missing required argument {field!r}') from None
         if kwds:
-            unexpected_set = set(kwds) - set(fields[n:])
+            unexpected_set = set(kwds) - set(field_names[n:])
             unexpected = ' and '.join(map(repr, sorted(unexpected_set)))
             if len(unexpected_set) == 1:
                 raise TypeError(f'{_cls.__name__}() got an unexpected keyword argument: {unexpected}')
             else:
                 raise TypeError(f'{_cls.__name__}() got unexpected keyword arguments: {unexpected}')
-        return tuple.__new__(_cls, newargs)
+        return tuple_new(_cls, newargs)
 
-if 0:
-
-    print( T(10, 20, 30, 40, 50, 60) )
-    print( T(10, 20, 30, f=60, e=50, d=40) )
-    print( T(f=60, e=50, d=40, c=30, b=20, a=10) )
-
-
-    try:
-        T(10, 20, 30, 40, 50, 60, 70, 80)
-    except TypeError as e:
-        assert 'were given' in e.args[0].lower()
-
-    try:
-        T(10, 20, 30, 40)
-    except TypeError as e:
-        assert 'missing' in e.args[0].lower()
-
-    try:
-        T(10, 20, 30, 40, 50, 60, h=70)
-    except TypeError as e:
-        assert "unexpected keyword argument: 'h'" in e.args[0].lower()
-
-    try:
-        T(10, 20, 30, 40, 50, 60, h=70, i=80)
-    except TypeError as e:
-        assert "unexpected keyword arguments: 'h' and 'i'" in e.args[0].lower()
-
-    try:
-        T(10, 20, 30, 40, 50, 60, c=70)
-    except TypeError as e:
-        assert "unexpected keyword argument: 'c'" in e.args[0].lower()
+    # XXX need to fix_up signature before returning
+    return __new__
 
 _nt_itemgetters = {}
 
@@ -423,11 +407,7 @@ def namedtuple(typename, field_names, *, rename=False, module=None):
 
     # Create all the named tuple methods to be added to the class namespace
 
-    s = f'def __new__(_cls, {arg_list}): return _tuple_new(_cls, ({arg_list}))'
-    namespace = {'_tuple_new': tuple_new, '__name__': f'namedtuple_{typename}'}
-    # Note: exec() has the side-effect of interning the typename and field names
-    exec(s, namespace)
-    __new__ = namespace['__new__']
+    __new__ = _nt_create_new_without_exec(typename, field_names)
     __new__.__doc__ = f'Create new instance of {typename}({arg_list})'
 
     @classmethod
