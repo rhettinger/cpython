@@ -359,7 +359,7 @@ def geometric_mean(data):
     36.0
     """
     try:
-        return exp(fmean(map(log, data)))
+        return exp(fmean(list(map(log, data))))
     except ValueError:
         raise StatisticsError('geometric mean requires a non-empty dataset '
                               ' containing positive numbers') from None
