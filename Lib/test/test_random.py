@@ -100,15 +100,6 @@ class TestBasicOps:
         self.assertTrue(lst != shuffled_lst)
         self.assertRaises(TypeError, shuffle, (1, 2, 3))
 
-    def test_shuffle_random_argument(self):
-        # Test random argument to shuffle.
-        shuffle = self.gen.shuffle
-        mock_random = unittest.mock.Mock(return_value=0.5)
-        seq = bytearray(b'abcdefghijk')
-        with self.assertWarns(DeprecationWarning):
-            shuffle(seq, mock_random)
-        mock_random.assert_called_with()
-
     def test_choice(self):
         choice = self.gen.choice
         with self.assertRaises(IndexError):

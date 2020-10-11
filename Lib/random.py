@@ -343,31 +343,18 @@ class Random(_random.Random):
         # raises IndexError if seq is empty
         return seq[self._randbelow(len(seq))]
 
-    def shuffle(self, x, random=None):
+    def shuffle(self, x):
         """Shuffle list x in place, and return None.
 
         Optional argument random is a 0-argument function returning a
-        random float in [0.0, 1.0); if it is the default None, the
-        standard random.random will be used.
+        random float in [0.0, 1.0).
 
         """
-
-        if random is None:
-            randbelow = self._randbelow
-            for i in reversed(range(1, len(x))):
-                # pick an element in x[:i+1] with which to exchange x[i]
-                j = randbelow(i + 1)
-                x[i], x[j] = x[j], x[i]
-        else:
-            _warn('The *random* parameter to shuffle() has been deprecated\n'
-                  'since Python 3.9 and will be removed in a subsequent '
-                  'version.',
-                  DeprecationWarning, 2)
-            floor = _floor
-            for i in reversed(range(1, len(x))):
-                # pick an element in x[:i+1] with which to exchange x[i]
-                j = floor(random() * (i + 1))
-                x[i], x[j] = x[j], x[i]
+        randbelow = self._randbelow
+        for i in reversed(range(1, len(x))):
+            # pick an element in x[:i+1] with which to exchange x[i]
+            j = randbelow(i + 1)
+            x[i], x[j] = x[j], x[i]
 
     def sample(self, population, k, *, counts=None):
         """Chooses k unique random elements from a population sequence or set.
