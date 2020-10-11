@@ -357,7 +357,7 @@ class Random(_random.Random):
             x[i], x[j] = x[j], x[i]
 
     def sample(self, population, k, *, counts=None):
-        """Chooses k unique random elements from a population sequence or set.
+        """Chooses k unique random elements from a population sequence.
 
         Returns a new list containing elements from the population while
         leaving the original population unchanged.  The resulting list is
@@ -409,11 +409,6 @@ class Random(_random.Random):
         # too many calls to _randbelow(), making them slower and
         # causing them to eat more entropy than necessary.
 
-        if isinstance(population, _Set):
-            _warn('Sampling from a set deprecated\n'
-                  'since Python 3.9 and will be removed in a subsequent version.',
-                  DeprecationWarning, 2)
-            population = tuple(population)
         if not isinstance(population, _Sequence):
             raise TypeError("Population must be a sequence.  For dicts or sets, use sorted(d).")
         n = len(population)

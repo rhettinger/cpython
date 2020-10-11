@@ -150,7 +150,7 @@ class TestBasicOps:
         self.assertRaises(TypeError, self.gen.sample, dict.fromkeys('abcdef'), 2)
 
     def test_sample_on_sets(self):
-        with self.assertWarns(DeprecationWarning):
+        with self.assertRaises(TypeError):
             population = {10, 20, 30, 40, 50, 60, 70}
             self.gen.sample(population, k=5)
 
