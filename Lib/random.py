@@ -155,12 +155,10 @@ class Random(_random.Random):
             a = int.from_bytes(a, 'big')
 
         elif not isinstance(a, (type(None), int, float, str, bytes, bytearray)):
-            _warn('Seeding based on hashing is deprecated\n'
-                  'since Python 3.9 and will be removed in a subsequent '
-                  'version. The only \n'
-                  'supported seed types are: None, '
+            raise TypeError(
+                  'The only supported seed types are: None, \n'
                   'int, float, str, bytes, and bytearray.',
-                  DeprecationWarning, 2)
+            )
 
         super().seed(a)
         self.gauss_next = None

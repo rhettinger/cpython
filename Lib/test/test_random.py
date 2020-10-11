@@ -48,12 +48,12 @@ class TestBasicOps:
             self.gen.seed(arg)
 
         for arg in [1+2j, tuple('abc'), MySeed()]:
-            with self.assertWarns(DeprecationWarning):
+            with self.assertRaises(TypeError):
                 self.gen.seed(arg)
 
         for arg in [list(range(3)), dict(one=1)]:
-            with self.assertWarns(DeprecationWarning):
-                self.assertRaises(TypeError, self.gen.seed, arg)
+            with self.assertRaises(TypeError):
+                self.gen.seed(arg)
         self.assertRaises(TypeError, self.gen.seed, 1, 2, 3, 4)
         self.assertRaises(TypeError, type(self.gen), [])
 
