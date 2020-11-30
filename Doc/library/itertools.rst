@@ -78,7 +78,7 @@ Examples                                         Results
 ``product('ABCD', repeat=2)``                    ``AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD``
 ``permutations('ABCD', 2)``                      ``AB AC AD BA BC BD CA CB CD DA DB DC``
 ``combinations('ABCD', 2)``                      ``AB AC AD BC BD CD``
-``combinations_with_replacement('ABCD', 2)``      ``AA AB AC AD BB BC BD CC CD DD``
+``combinations_with_replacement('ABCD', 2)``     ``AA AB AC AD BB BC BD CC CD DD``
 ==============================================   =============================================================
 
 
@@ -823,13 +823,12 @@ which incur interpreter overhead.
        "List unique elements, preserving order. Remember all elements ever seen."
        # unique_everseen('AAAABBBCCDAABBB') --> A B C D
        # unique_everseen('ABBCcAD', str.lower) --> A B C D
-       seen = set()
-       seen_add = seen.add
        if key is None:
-           for element in filterfalse(seen.__contains__, iterable):
-               seen_add(element)
-               yield element
+           # Note, fromkeys() consumes the entire input iterable at once
+           yield from dict.fromkeys(iterable)
        else:
+           seen = set()
+           seen_add = seen.add
            for element in iterable:
                k = key(element)
                if k not in seen:

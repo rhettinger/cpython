@@ -2348,14 +2348,12 @@ Samuele
 ...     "List unique elements, preserving order. Remember all elements ever seen."
 ...     # unique_everseen('AAAABBBCCDAABBB') --> A B C D
 ...     # unique_everseen('ABBCcAD', str.lower) --> A B C D
-...     seen = set()
-...     seen_add = seen.add
 ...     if key is None:
-...         for element in iterable:
-...             if element not in seen:
-...                 seen_add(element)
-...                 yield element
+...          # Note, fromkeys() consumes the entire input iterable at once
+...          yield from dict.fromkeys(iterable)
 ...     else:
+...         seen = set()
+...         seen_add = seen.add
 ...         for element in iterable:
 ...             k = key(element)
 ...             if k not in seen:
