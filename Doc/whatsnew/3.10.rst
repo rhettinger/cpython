@@ -345,6 +345,11 @@ raised from:
 
 (Contributed by Pablo Galindo in :issue:`38530`.)
 
+   .. warning::
+      Notice this won't work if :c:func:`PyErr_Display` is not called to display the error
+      which can happen if some other custom error display function is used. This is a common
+      scenario in some REPLs like IPython.
+
 NameErrors
 ~~~~~~~~~~
 
@@ -361,6 +366,12 @@ was raised from:
     NameError: name 'schwarschild_black_hole' is not defined. Did you mean: schwarzschild_black_hole?
 
 (Contributed by Pablo Galindo in :issue:`38530`.)
+
+   .. warning::
+      Notice this won't work if :c:func:`PyErr_Display` is not called to display the error,
+      which can happen if some other custom error display function is used. This is a common
+      scenario in some REPLs like IPython.
+
 
 PEP 626: Precise line numbers for debugging and other tools
 -----------------------------------------------------------
@@ -835,6 +846,13 @@ Other Language Changes
   alter the processing of symbol table as annotations are now rendered
   effectless under ``from __future__ import annotations``.
   (Contributed by Batuhan Taskaya in :issue:`42725`.)
+
+* Hashes of NaN values of both :class:`float` type and
+  :class:`decimal.Decimal` type now depend on object identity. Formerly, they
+  always hashed to ``0`` even though NaN values are not equal to one another.
+  This caused potentially quadratic runtime behavior due to excessive hash
+  collisions when creating dictionaries and sets containing multiple NaNs.
+  (Contributed by Raymond Hettinger in :issue:`43475`.)
 
 New Modules
 ===========
