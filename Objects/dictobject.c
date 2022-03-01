@@ -2208,7 +2208,7 @@ dict_ass_sub(PyDictObject *mp, PyObject *v, PyObject *w)
 }
 
 static PyMappingMethods dict_as_mapping = {
-    (lenfunc)dict_length, /*mp_length*/
+    0,                          /*mp_length*/
     (binaryfunc)dict_subscript, /*mp_subscript*/
     (objobjargproc)dict_ass_sub, /*mp_ass_subscript*/
 };
@@ -3420,9 +3420,9 @@ _PyDict_ContainsId(PyObject *op, _Py_Identifier *key)
     return PyDict_Contains(op, kv);
 }
 
-/* Hack to implement "key in dict" */
+/* Hack to implement "key in dict" and speed-up len(d) */
 static PySequenceMethods dict_as_sequence = {
-    0,                          /* sq_length */
+    (lenfunc)dict_length,       /* sq_length */
     0,                          /* sq_concat */
     0,                          /* sq_repeat */
     0,                          /* sq_item */
