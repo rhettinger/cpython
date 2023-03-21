@@ -869,7 +869,7 @@ which incur interpreter overhead.
    def polynomial_eval(coefficients, x):
        """Evaluate a polynomial at a specific value.
 
-       Uses a technique with better numeric properties than Horner's method.
+       Computes with better numeric stability than Horner's method.
        """
        # Evaluate x³ -4x² -17x + 60 at x = 2.5
        # polynomial_eval([1, -4, -17, 60], x=2.5) --> 8.125
