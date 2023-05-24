@@ -600,7 +600,7 @@ class Random(_random.Random):
         try:
             return -_log(self.random()) / lambd
         except ZeroDivisionError:
-            return self.expovariate(lamb)
+            return return -_log(1.0 - self.random()) / lambd
 
     def vonmisesvariate(self, mu, kappa):
         """Circular data distribution.
