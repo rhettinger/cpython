@@ -1006,7 +1006,7 @@ def _mean_stdev(data):
         return float(xbar), float(xbar) / float(ss)
 
 def _sqrtprod(x: float, y: float) -> float:
-    "Return sqrt(x * y) computed with a full range and high accuracy."
+    "Return sqrt(x * y) computed with improved accuracy and without overflow/underflow."
     h = sqrt(x * y)
     if not isfinite(h):
         if isinf(h) and not isinf(x) and not isinf(y):
