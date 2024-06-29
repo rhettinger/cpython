@@ -1892,16 +1892,22 @@ def _quick_select(data: list['T'], k: int) -> 'T':
 
         lo = []
         hi = []
+        eq = []
         for x in data:
             if x < pivot:
                 lo.append(x)
-            else:
+            elif pivot < x:
                 hi.append(x)
+            else:
+                eq.append(x)
 
         if k < len(lo):
             data = lo
         else:
             k -= len(lo)
+            if k < len(eq):
+                return pivot
+            k -= len(eq)
             data = hi
 
     return sorted(data)[k]
