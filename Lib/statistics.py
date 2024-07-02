@@ -1887,9 +1887,13 @@ def _quick_select(data: list['T'], k: int) -> 'T':
         # Select pivot from the median of a sample.
         # For larger inputs, make the sample size larger.
         # Use choices() instead of sample() for speed.
-        ss = round(log(len(data))) | 1
+        ss = round(log2(len(data))) | 1
         pivot = sorted(choices(data, k=ss))[ss // 2]
 
+        # Partition data using only __lt__() like sorted().
+        # Ordering is stable like sorted().
+        # The eq bin is necessary to handle pathological cases
+        # where all the elements are equal.
         lo = []
         hi = []
         eq = []
