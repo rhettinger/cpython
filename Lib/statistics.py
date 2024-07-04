@@ -143,6 +143,7 @@ from math import isfinite, isinf, pi, cos, sin, tan, cosh, asin, atan, acos
 from functools import reduce
 from operator import itemgetter
 from collections import Counter, namedtuple, defaultdict
+from random import choices
 
 _SQRT2 = sqrt(2.0)
 _random = random
@@ -336,15 +337,17 @@ def median(data):
     4.0
 
     """
-    data = sorted(data)
+    data = list(data)
     n = len(data)
     if n == 0:
         raise StatisticsError("no median for empty data")
     if n % 2 == 1:
-        return data[n // 2]
+        return _quick_select(data, n // 2)
     else:
         i = n // 2
-        return (data[i - 1] + data[i]) / 2
+        m1 = _quick_select(data, i - 1)
+        m2 = _quick_select(data, i)
+        return (m1 + m2) / 2
 
 
 def median_low(data):
@@ -362,14 +365,14 @@ def median_low(data):
     # Potentially the sorting step could be replaced with a quickselect.
     # However, it would require an excellent implementation to beat our
     # highly optimized builtin sort.
-    data = sorted(data)
+    data = list(data)
     n = len(data)
     if n == 0:
         raise StatisticsError("no median for empty data")
     if n % 2 == 1:
-        return data[n // 2]
+        return _quick_select(data, n // 2)
     else:
-        return data[n // 2 - 1]
+        return _quick_select(data, n // 2 - 1)
 
 
 def median_high(data):
@@ -384,11 +387,11 @@ def median_high(data):
     5
 
     """
-    data = sorted(data)
+    data = list(data)
     n = len(data)
     if n == 0:
         raise StatisticsError("no median for empty data")
-    return data[n // 2]
+    return _quick_select(data, n // 2)
 
 
 def median_grouped(data, interval=1.0):
@@ -1857,3 +1860,40 @@ def _sqrtprod(x: float, y: float) -> float:
     # https://www.wolframalpha.com/input/?i=Maclaurin+series+sqrt%28h**2+%2B+x%29+at+x%3D0
     d = sumprod((x, h), (y, -h))
     return h + d / (2.0 * h)
+
+
+def _quick_select(data, k):
+    'Efficiently find sorted(data)[k]'
+
+    if not 0 <= k < len(data):
+        raise IndexError
+
+    while len(data) > 100:
+
+        # Select pivot from the median of a sample.
+        # For larger inputs, make the sample size larger.
+        # Use choices() instead of sample() for speed.
+        ss = round(log(len(data))) | 1
+        pivot = sorted(choices(data, k=ss))[ss // 2]
+
+        lo = []
+        hi = []
+        eq = []
+        for x in data:
+            if x < pivot:
+                lo.append(x)
+            elif pivot < x:
+                hi.append(x)
+            else:
+                eq.append(x)
+
+        if k < len(lo):
+            data = lo
+        else:
+            k -= len(lo)
+            if k < len(eq):
+                return eq[k]
+            k -= len(eq)
+            data = hi
+
+    return sorted(data)[k]
