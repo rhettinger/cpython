@@ -146,7 +146,7 @@ from operator import itemgetter
 from collections import Counter, namedtuple, defaultdict
 
 _SQRT2 = sqrt(2.0)
-_SQRT2PI = sqrt(2.0 * pi)
+_SQRT2PI = float.fromhex('0x1.40d931ff62706p+1')  # Correctly rounded sqrt(2*pi)
 _random = random
 
 ## Exceptions ##############################################################
@@ -821,8 +821,8 @@ def register(*kernels):
 
 @register('normal', 'gauss')
 def normal_kernel():
-    sqrt2pi = sqrt(2 * pi)
-    neg_sqrt2 = -sqrt(2)
+    sqrt2pi = _SQRT2PI
+    neg_sqrt2 = -_SQRT2
     pdf = lambda t: exp(-1/2 * t * t) / sqrt2pi
     cdf = lambda t: 1/2 * erfc(t / neg_sqrt2)
     invcdf = lambda t: _normal_dist_inv_cdf(t, 0.0, 1.0)
